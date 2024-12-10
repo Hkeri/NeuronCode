@@ -336,7 +336,7 @@ def memory(user_response, ai_response):
     with open(f"\\Neuron_App\\data\\memory.txt", "r+") as file:
         file.write(f"User Response: {user_response} | AI Response: {ai_response}")
         file.close()
- 
+
 def output():
     global button2_pressed
     user = input_box.get().lower()
@@ -562,6 +562,9 @@ def output():
         if button2_pressed:
            directory_path = input_box.get()
            add(file_organizer(directory_path))
+    
+    if re.search("calculator", user):
+        calculator()
 
     if (
         not ("tic tac toe" or "tictactoe" or "tic-tac-toe")
@@ -697,70 +700,6 @@ def qrcode_gui():
     my_button2.pack(pady=20)
     my_button2.place(x=450, y=200)
 
-
-def yt_downloader_gui():
-    customtkinter.set_appearance_mode("dark")
-    root.withdraw()
-    yt_gui = customtkinter.CTkToplevel()
-    yt_gui.title("Neuron | YouTube Downloader")
-    yt_gui.geometry("550x250")
-
-    def show_original():
-        yt_gui.destroy()
-        customtkinter.set_appearance_mode(mode)
-        root.deiconify()
-
-    def destoryicon():
-        exit()
-
-    def get_info():
-        info = des_entry.get()
-        yt_downloader_gui(info)
-
-    des_entry = customtkinter.CTkEntry(
-        yt_gui,
-        placeholder_text="Enter The Youtube Url To Download",
-        width=540,
-        height=75,
-        corner_radius=50,
-        font=("Consolas", 18),
-    )
-    des_entry.pack(pady=20)
-
-    my_button = customtkinter.CTkButton(
-        yt_gui,
-        text="Show Main",
-        command=show_original,
-        corner_radius=50,
-        font=my_font_for_buttons,
-        border_color="#41FDFE"
-    )
-    my_button.pack(pady=20)
-    my_button.place(x=50, y=200)
-
-    enter_button = customtkinter.CTkButton(
-        yt_gui,
-        text="Done",
-        command=get_info,
-        corner_radius=50,
-        font=my_font_for_buttons,
-        border_color="#41FDFE"
-    )
-
-    enter_button.pack(pady=20)
-
-    my_button2 = customtkinter.CTkButton(
-        yt_gui,
-        text="Exit",
-        command=destoryicon,
-        corner_radius=50,
-        font=my_font_for_buttons,
-        border_color="#41FDFE"
-    )
-    my_button2.pack(pady=20)
-    my_button2.place(x=450, y=200)
-
-
 def add(user_text: str):
     os.system("cls" if os.name == "nt" else "clear")
     n = 0
@@ -893,21 +832,10 @@ exit_button = customtkinter.CTkButton(
     corner_radius=50,
     hover_color="red",
     font=("Consolas", 15),
-    border_color="#41FDFE", fg_color="transparent", border_width=2
+    border_color="#41FDFE", fg_color="transparent", border_width=1
 )
 exit_button.pack(pady=20)
 exit_button.place(x=15, y=(coord_y_1 - -805))
-
-yt_button = customtkinter.CTkButton(
-    master=sidebar_frame,
-    text="YouTube Downloader",
-    command=yt_downloader_gui,
-    corner_radius=50,
-    font=my_font_for_buttons_2,
-    border_color="#41FDFE", fg_color="transparent", border_width=2
-)
-yt_button.pack(pady=20)
-yt_button.place(x=15, y=(coord_y_1 - -755))
 
 text_label = customtkinter.CTkLabel(
     root, text=f"{random.choice(quotes)}", font=(my_font)
@@ -921,7 +849,7 @@ icon_button = customtkinter.CTkButton(
     command=icon_close,
     corner_radius=50,
     font=my_font_for_buttons,
-    border_color="#41FDFE", fg_color="transparent", border_width=2
+    border_color="#41FDFE", fg_color="transparent", border_width=1
 )
 icon_button.pack(pady=20)
 icon_button.place(x=13, y=(coord_y_1 - -555))
@@ -932,7 +860,7 @@ status_button = customtkinter.CTkButton(
     command=status,
     corner_radius=50,
     font=my_font_for_buttons,
-    border_color="#41FDFE", fg_color="transparent", border_width=2
+    border_color="#41FDFE", fg_color="transparent", border_width=1
 )
 status_button.pack(pady=20)
 status_button.place(x=15, y=(coord_y_1 - -605))
@@ -953,7 +881,7 @@ hc_button = customtkinter.CTkButton(
     command=hc,
     corner_radius=50,
     font=my_font_for_buttons,
-    border_color="#41FDFE", fg_color="transparent", border_width=2
+    border_color="#41FDFE", fg_color="transparent", border_width=1
 )
 
 hc_button.pack(pady=20)
@@ -978,7 +906,7 @@ earth_button = customtkinter.CTkButton(
     font=my_font_for_buttons,
     command=earth,
     corner_radius=50,
-    border_color="#41FDFE", fg_color="transparent", border_width=2
+    border_color="#41FDFE", fg_color="transparent", border_width=1
 )
 earth_button.pack(pady=20)
 earth_button.place(x=15, y=(coord_y_1 - -455))
@@ -989,7 +917,7 @@ iss_button = customtkinter.CTkButton(
     font=my_font_for_buttons,
     command=iss,
     corner_radius=50,
-    border_color="#41FDFE", fg_color="transparent", border_width=2
+    border_color="#41FDFE", fg_color="transparent", border_width=1
 )
 iss_button.pack(pady=20)
 iss_button.place(x=15, y=(coord_y_1 - -505))
@@ -1010,7 +938,7 @@ calc_button = customtkinter.CTkButton(
     command=calculator,
     corner_radius=50,
     font=my_font_for_buttons_2,
-    border_color="#41FDFE", fg_color="transparent", border_width=2
+    border_color="#41FDFE", fg_color="transparent", border_width=1
 )
 calc_button.pack(pady=20)
 calc_button.place(x=15, y=(coord_y_1 - -310))
@@ -1021,21 +949,10 @@ tictactoe_button = customtkinter.CTkButton(
     command=tictactoe,
     corner_radius=50,
     font=my_font_for_buttons,
-    border_color="#41FDFE", fg_color="transparent", border_width=2
+    border_color="#41FDFE", fg_color="transparent", border_width=1
 )
 tictactoe_button.pack(pady=20)
 tictactoe_button.place(x=15, y=(coord_y_1 - -405))
-
-qr_button = customtkinter.CTkButton(
-    sidebar_frame,
-    text="Generate QrCode",
-    command=qrcode_gui,
-    corner_radius=50,
-    font=my_font_for_buttons_2,
-    border_color="#41FDFE", fg_color="transparent", border_width=2
-)
-qr_button.pack(pady=20)
-qr_button.place(x=15, y=(coord_y_1 - -655))
 
 comp_vis_button = customtkinter.CTkButton(
     sidebar_frame,
@@ -1043,10 +960,10 @@ comp_vis_button = customtkinter.CTkButton(
     command=computer_vision,
     corner_radius=50,
     font=my_font_for_buttons_2,
-    border_color="#41FDFE", fg_color="transparent", border_width=2
+    border_color="#41FDFE", fg_color="transparent", border_width=1
 )
 comp_vis_button.pack(pady=20)
-comp_vis_button.place(x=15, y=(coord_y_1 - -705))
+comp_vis_button.place(x=15, y=(coord_y_1 - -655))
 
 show_answer_label = customtkinter.CTkLabel(root, text="", font=("Consolas", 23))
 show_answer_label.pack(pady=20)
@@ -1067,7 +984,7 @@ button2 = customtkinter.CTkButton(
     width=35,
     height=45,
     font=my_font_for_buttons,
-    border_color="#41FDFE", fg_color="transparent", border_width=2
+    border_color="#41FDFE", fg_color="transparent", border_width=1
 )
 button2.pack(pady=20)
 button2.place(x=(x - 50), y=267)
@@ -1079,7 +996,7 @@ my_button = customtkinter.CTkButton(
     command=change,
     corner_radius=50,
     font=my_font_for_buttons_2,
-    border_color="#41FDFE", fg_color="transparent", border_width=2
+    border_color="#41FDFE", fg_color="transparent", border_width=1
 )
 my_button.pack(pady=20)
 my_button.place(x=22, y=(coord_y + 355))
