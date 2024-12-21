@@ -1,86 +1,40 @@
-# import required modules
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-import time
+from tkinter import *
+from tkinter import font
 
+root = Tk()
+root.title('Font Families')
+fonts=list(font.families())
+fonts.sort()
 
-def Glogin(mail_address, password):
-	# Login Page
-	driver.get(
-		'https://accounts.google.com/ServiceLogin?hl=en&passive=true&continue=https://www.google.com/&ec=GAZAAQ')
+def populate(frame):
+    '''Put in the fonts'''
+    listnumber = 1
+    for i, item in enumerate(fonts):
+        label = "listlabel" + str(listnumber)
+        label = Label(frame,text=item,font=(item, 16))
+        label.grid(row=i)
+        label.bind("<Button-1>",lambda e,item=item:copy_to_clipboard(item))
+        listnumber += 1
 
-	# input Gmail
-	driver.find_element(By.ID, "identifierId").send_keys(mail_address)
-	driver.find_element(By.ID, "identifierNext").click()
-	driver.implicitly_wait(10)
+def copy_to_clipboard(item):
+    root.clipboard_clear()
+    root.clipboard_append("font=('" + item.lstrip('@') + "', 12)")
 
-	# input Password
-	driver.find_element(By.XPATH,
-		'//*[@id="password"]/div[1]/div/div[1]/input').send_keys(password)
-	driver.implicitly_wait(10)
-	driver.find_element(By.ID, "passwordNext").click()
-	driver.implicitly_wait(10)
+def onFrameConfigure(canvas):
+    '''Reset the scroll region to encompass the inner frame'''
+    canvas.configure(scrollregion=canvas.bbox("all"))
 
-	# go to google home page
-	driver.get('https://google.com/')
-	driver.implicitly_wait(100)
+canvas = Canvas(root, borderwidth=0, background="#ffffff")
+frame = Frame(canvas, background="#ffffff")
+vsb = Scrollbar(root, orient="vertical", command=canvas.yview)
+canvas.configure(yscrollcommand=vsb.set)
 
+vsb.pack(side="right", fill="y")
+canvas.pack(side="left", fill="both", expand=True)
+canvas.create_window((4,4), window=frame, anchor="nw")
 
-def turnOffMicCam():
-	# turn off Microphone
-	time.sleep(2)
-	driver.find_element(By.XPATH,
-		'//*[@id="yDmH0d"]/c-wiz/div/div/div[8]/div[3]/div/div/div[2]/div/div[1]/div[1]/div[1]/div/div[4]/div[1]/div/div/div').click()
-	driver.implicitly_wait(3000)
+frame.bind("<Configure>", lambda event, canvas=canvas: onFrameConfigure(canvas))
 
-	# turn off camera
-	time.sleep(1)
-	driver.find_element(By.XPATH,
-		'//*[@id="yDmH0d"]/c-wiz/div/div/div[8]/div[3]/div/div/div[2]/div/div[1]/div[1]/div[1]/div/div[4]/div[2]/div/div').click()
-	driver.implicitly_wait(3000)
+populate(frame)
 
-
-def joinNow():
-	# Join meet
-	print(1)
-	time.sleep(5)
-	driver.implicitly_wait(2000)
-	driver.find_element(By.CSS_SELECTOR,
-		'div.uArJ5e.UQuaGc.Y5sE8d.uyXBBb.xKiqt').click()
-	print(1)
-
-
-def AskToJoin():
-	# Ask to Join meet
-	time.sleep(5)
-	driver.implicitly_wait(2000)
-	driver.find_element(By.CSS_SELECTOR,
-		'div.uArJ5e.UQuaGc.Y5sE8d.uyXBBb.xKiqt').click()
-	# Ask to join and join now buttons have same xpaths
-
-
-# assign email id and password
-mail_address = 'emaild@gmail.com'
-password = 'geeksforgeeks'
-
-# create chrome instance
-opt = Options()
-opt.add_argument('--disable-blink-features=AutomationControlled')
-opt.add_argument('--start-maximized')
-opt.add_experimental_option("prefs", {
-	"profile.default_content_setting_values.media_stream_mic": 1,
-	"profile.default_content_setting_values.media_stream_camera": 1,
-	"profile.default_content_setting_values.geolocation": 0,
-	"profile.default_content_setting_values.notifications": 1
-})
-driver = webdriver.Chrome(options=opt)
-
-# login to Google account
-Glogin(mail_address, password)
-
-# go to google meet
-driver.get('https://meet.google.com/xby-zehb-ncf')
-turnOffMicCam()
-# AskToJoin()
-joinNow()
+root.mainloop()

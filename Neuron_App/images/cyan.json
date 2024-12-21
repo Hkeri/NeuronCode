@@ -17,8 +17,8 @@
     "border_width": 0,
     "fg_color": ["#4A90E2", "#4A90E2"],
     "hover_color": ["#357ABD", "#357ABD"],
-    "border_color": ["#7B8D99", "#A1B2B8"],
-    "text_color": ["#FFFFFF", "#FFFFFF"],
+    "border_color": ["#025951", "#41FDFE"],
+    "text_color": ["#000000", "#FFFFFF"],
     "text_color_disabled": ["#B0BEC5", "#A1A1A1"]
   },
   "CTkLabel": {

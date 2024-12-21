@@ -35,7 +35,6 @@ from features import age_safety
 import subprocess
 import pyautogui
 from features import melody_generator
-import ctypes
 import cv2
 
 
@@ -50,8 +49,6 @@ root = customtkinter.CTk()
 customtkinter.set_widget_scaling(0.80)
 customtkinter.set_window_scaling(1)
 root.attributes('-alpha',0.935)
-myappid = "mycompany.myproduct.subproduct.version"
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 root.resizable(False, False)
 
 def is_cam_opened():
@@ -67,29 +64,6 @@ def is_cam_opened():
 
 root.iconbitmap(f"{settings.dir_agi}\\images\\agi_icon_2.ico")
 mode = "dark"
-text_window = customtkinter.CTk()
-customtkinter.set_appearance_mode("dark")
-text_window.title("Answer")
-
-text_gui = customtkinter.CTkTextbox(
-    text_window, width=455, height=455, corner_radius=50, font=("Consolas", 15)
-)
-text_gui.pack(pady=20)
-
-
-def destorytext_window():
-    root.deiconify()
-    text_window.withdraw()
-
-
-my_button2 = customtkinter.CTkButton(
-    text_window, text="Go Back", command=destorytext_window, corner_radius=50, border_color="#41FDFE"
-)
-my_button2.pack(pady=20)
-my_button2.place(x=207, y=460)
-
-text_window.withdraw()
-
 dark_sync = [
     "reg.exe",
     "add",
@@ -117,7 +91,7 @@ light_sync = [
 ]
 
 subprocess.call(dark_sync)
-root.title("Project A.G.I. | Artifical General Intelligence")
+root.title("NEURON")
 
 width = root.winfo_screenwidth()
 height = root.winfo_screenheight()
@@ -127,11 +101,6 @@ root.geometry(f"1066x518+{int(x)}+{int(y)}")
 my_font = customtkinter.CTkFont(family="Consolas", size=25, slant="italic")
 my_font_for_buttons = customtkinter.CTkFont(family="Consolas", size=15)
 my_font_for_buttons_2 = customtkinter.CTkFont(family="Consolas", size=13)
-
-def text_answer(extra):
-    root.withdraw()
-    text_window.deiconify()
-    text_gui.insert("end", extra)
 
 @lru_cache
 def Temp(city):
@@ -440,13 +409,36 @@ def output():
                 )
 
     if re.search("open", user):
-        query = user.replace("open ", "")
-        query = query.replace("open", "")
-        try:
-            openappweb(user)
-            add(f"I Have Opened {query}")
-        except:
-            add(f"I Cannot Open {query}")
+        if re.search("article" or "report" or "research", user):
+            topic = response(f"What is the Topic of this Question. '{user}'")
+            webbrowser.open(f"https://www.google.com/search?q={topic}")
+        if re.search("globe" or "earth", user):
+            add("Showing A Globe of Earth")
+            earth()
+        if re.search("tic tac toe" or "tictactoe" or "tic-tac-toe", user):
+            add("Opening Tic Tac Toe Game")
+            tictactoe()
+        if re.search("task" and "manager", user):
+            keyboard.press_and_release("ctrl + shift + escape")
+            add("I Have Opened Task Manager")
+        if re.search("iss", user):
+            add("Opening the ISS GUI")
+            iss()
+        if re.search("calculator", user):
+            calculator()
+        if re.search("chess", user):
+            chess()
+        if re.search("computer" and "status", user):
+            add("Showing Computer's Features")
+            status()
+        else:
+            query = user.replace("open ", "")
+            query = query.replace("open", "")
+            try:
+                openappweb(user)
+                add(f"I Have Opened {query}")
+            except:
+                add(f"I Cannot Open {query}")
 
     if re.search("close", user):
         query = user.replace("close ", "")
@@ -457,9 +449,6 @@ def output():
         except:
             add(f"I Cannot Close {query}")
 
-    if re.search("task" and "manager", user):
-        keyboard.press_and_release("ctrl + shift + escape")
-        add("I Have Opened Task Manager")
 
     if re.search("whatsapp" and "send", user):
         whatsapp_send()
@@ -527,29 +516,11 @@ def output():
         if button2_pressed:
            qr_url = input_box.get()
         qrCodeGenerator(qr_url)
-    
-    if re.search("iss", user):
-        add("Opening the ISS GUI")
-        iss()
-    
-    if re.search("tic tac toe" or "tictactoe" or "tic-tac-toe", user):
-        add("Opening Tic Tac Toe Game")
-        tictactoe()
-    
-    if re.search("computer" and "checkup", user):
-        add(hc())
+
     
     if re.search(("make" or "create") and ("melody" or "music" or "song"), user):
         add("Making a Melody")
         melody_generator()
-    
-    if re.search("computer" and "status", user):
-        add("Showing Computer's Features")
-        status()
-    
-    if re.search("open" and "earth", user):
-        add("Showing A Globe of Earth")
-        earth()
 
     if re.search("generate" and "image", user):
         add("Okay, Generating an image")
@@ -562,17 +533,17 @@ def output():
         if button2_pressed:
            directory_path = input_box.get()
            add(file_organizer(directory_path))
+
+    if re.search("type", user):
+        add("Okay, I Will Type it On Your Screen")
+        answer = user.replace("type", "make")
+        answer = response(answer)
+        pyautogui.write(answer)
     
-    if re.search("calculator", user):
-        calculator()
 
     if (
-        not ("tic tac toe" or "tictactoe" or "tic-tac-toe")
-        or ("computer" and "status")
-        or ("organize" and "files")
+        not ("organize" and "files")
         or ("generate" and "image")
-        or ("open" and "earth")
-        or ("iss")
         or (("download" or "install") and "image")
         or (("clean" or "destory") and ("temp" or "temporary") and ("files" or "file"))
         or (("create" or "generate" or "make") and "file")
@@ -581,7 +552,6 @@ def output():
         or ("generate" and ("melody" or "music" or "song"))
         or ("email" and "")
         or ("whatsapp" and "send")
-        or ("task" and "manager")
         or ("close")
         or ("open")
         or ("battery")
@@ -598,7 +568,8 @@ def output():
         or ("youtube search")
         or ("transcribe" and "audio")
         or ("download" and "youtube" and "video")
-        or (("make" or "create") and "qrcode") in user
+        or (("make" or "create") and "qrcode")
+        or ("type") in user
     ):
         ans = response(user)
         memory(user, ans)
@@ -610,12 +581,8 @@ def icon_close():
     icon_window = customtkinter.CTkToplevel()
     icon_window.title("Neuron App")
     icon_window.geometry("400x250")
-    my_image = customtkinter.CTkImage(
-        light_image=Image.open(f"{settings.dir_agi}\\images\\jarvislogon.png"),
-        dark_image=Image.open(f"{settings.dir_agi}\\images\\jarvislogon.png"),
-        size=(400, 150),
-    )
-    label_image1 = customtkinter.CTkLabel(icon_window, text="", image=my_image)
+
+    label_image1 = customtkinter.CTkLabel(icon_window, text="Neuron", font=("Consolas", 65))
     label_image1.pack(pady=20)
 
     def show_original():
@@ -702,18 +669,19 @@ def qrcode_gui():
 
 def add(user_text: str):
     os.system("cls" if os.name == "nt" else "clear")
+    queries_widget.delete("1.0", "end")
     n = 0
 
     def animate_label():
         input_box.delete(0, "end")
         nonlocal n
         if n < len(user_text):
-            show_answer_label.configure(text=user_text[: n + 1])
+            queries_widget.insert("end", user_text[: n + 1])
             root.after(70, animate_label)
             n += 1
 
     if len(user_text) >= 150:
-        text_answer(user_text)
+        root.after(1000, animate_label)
     if len(user_text) <= 150:
         if re.search("yes", is_speaker_working.lower()):
             root.after(1000, animate_label)
@@ -750,7 +718,7 @@ def date():
     date_label.after(1000, date)
 
 @lru_cache
-def temp():
+def temp(): #battery included
     IP = requests.get("https://api.ipify.org").text
     url = "https://get.geojs.io/v1/ip/geo/" + IP + ".json"
     geo_reqeust = requests.get(url)
@@ -765,6 +733,7 @@ def temp():
         ),
     )
     temp_label.after(3600000, temp)
+    
 
 
 def computer_vision():
@@ -772,6 +741,10 @@ def computer_vision():
         f"{settings.python_exe_location} {settings.dir_agi}\\features\\Computer_Vision\\GUi.py"
     )
 
+def chess():
+    os.system(
+        f"{settings.python_exe_location} {settings.dir_agi}\\features\\Chess\\ChessGame.py"
+    )
 
 def melody():
     os.system(
@@ -809,11 +782,6 @@ def iss():
     )
 
 
-def hc():
-    from features.healthcare import HealthCare
-    HealthCare.grand_finale()
-
-
 coord_y = (height - 460) + -50
 
 
@@ -832,7 +800,7 @@ exit_button = customtkinter.CTkButton(
     corner_radius=50,
     hover_color="red",
     font=("Consolas", 15),
-    border_color="#41FDFE", fg_color="transparent", border_width=1
+     fg_color="transparent", border_width=1
 )
 exit_button.pack(pady=20)
 exit_button.place(x=15, y=(coord_y_1 - -805))
@@ -849,7 +817,7 @@ icon_button = customtkinter.CTkButton(
     command=icon_close,
     corner_radius=50,
     font=my_font_for_buttons,
-    border_color="#41FDFE", fg_color="transparent", border_width=1
+     fg_color="transparent", border_width=1
 )
 icon_button.pack(pady=20)
 icon_button.place(x=13, y=(coord_y_1 - -555))
@@ -860,7 +828,7 @@ status_button = customtkinter.CTkButton(
     command=status,
     corner_radius=50,
     font=my_font_for_buttons,
-    border_color="#41FDFE", fg_color="transparent", border_width=1
+     fg_color="transparent", border_width=1
 )
 status_button.pack(pady=20)
 status_button.place(x=15, y=(coord_y_1 - -605))
@@ -875,17 +843,10 @@ temp_label.pack(pady=20)
 temp_label.place(x=260, y=(coord_y + 350))
 temp()
 
-hc_button = customtkinter.CTkButton(
-    sidebar_frame,
-    text="Health Care",
-    command=hc,
-    corner_radius=50,
-    font=my_font_for_buttons,
-    border_color="#41FDFE", fg_color="transparent", border_width=1
-)
-
-hc_button.pack(pady=20)
-hc_button.place(x=15, y=(coord_y_1 - -355))
+queries_widget = customtkinter.CTkTextbox(root, width=800, height=180, font=("Consolas", 15), corner_radius=50)
+queries_widget.pack(pady=20)
+queries_widget.place(x=300, y=367)
+button2_pressed = False
 
 
 date_label = customtkinter.CTkLabel(root, text="", font=("Consolas", 30))
@@ -897,7 +858,7 @@ day_label = customtkinter.CTkLabel(root, text=C_Day(), font=("Consolas", 25))
 day_label.pack(pady=30, padx=30)
 day_label.place(x=(x + 150), y=155)  # 260
 
-label_neuron = customtkinter.CTkLabel(root, text="Neuron", font=("Great Vibes", 165))
+label_neuron = customtkinter.CTkLabel(root, text="Neuron", font=("Ankh Sanctuary", 165), text_color="#41FDFE")
 label_neuron.pack(pady=20)
 
 earth_button = customtkinter.CTkButton(
@@ -906,7 +867,7 @@ earth_button = customtkinter.CTkButton(
     font=my_font_for_buttons,
     command=earth,
     corner_radius=50,
-    border_color="#41FDFE", fg_color="transparent", border_width=1
+     fg_color="transparent", border_width=1
 )
 earth_button.pack(pady=20)
 earth_button.place(x=15, y=(coord_y_1 - -455))
@@ -917,7 +878,7 @@ iss_button = customtkinter.CTkButton(
     font=my_font_for_buttons,
     command=iss,
     corner_radius=50,
-    border_color="#41FDFE", fg_color="transparent", border_width=1
+     fg_color="transparent", border_width=1
 )
 iss_button.pack(pady=20)
 iss_button.place(x=15, y=(coord_y_1 - -505))
@@ -938,7 +899,7 @@ calc_button = customtkinter.CTkButton(
     command=calculator,
     corner_radius=50,
     font=my_font_for_buttons_2,
-    border_color="#41FDFE", fg_color="transparent", border_width=1
+     fg_color="transparent", border_width=1
 )
 calc_button.pack(pady=20)
 calc_button.place(x=15, y=(coord_y_1 - -310))
@@ -949,7 +910,7 @@ tictactoe_button = customtkinter.CTkButton(
     command=tictactoe,
     corner_radius=50,
     font=my_font_for_buttons,
-    border_color="#41FDFE", fg_color="transparent", border_width=1
+     fg_color="transparent", border_width=1
 )
 tictactoe_button.pack(pady=20)
 tictactoe_button.place(x=15, y=(coord_y_1 - -405))
@@ -960,14 +921,10 @@ comp_vis_button = customtkinter.CTkButton(
     command=computer_vision,
     corner_radius=50,
     font=my_font_for_buttons_2,
-    border_color="#41FDFE", fg_color="transparent", border_width=1
+     fg_color="transparent", border_width=1
 )
 comp_vis_button.pack(pady=20)
 comp_vis_button.place(x=15, y=(coord_y_1 - -655))
-
-show_answer_label = customtkinter.CTkLabel(root, text="", font=("Consolas", 23))
-show_answer_label.pack(pady=20)
-button2_pressed = False
 
 def button2_command():
     global button2_pressed
@@ -984,10 +941,21 @@ button2 = customtkinter.CTkButton(
     width=35,
     height=45,
     font=my_font_for_buttons,
-    border_color="#41FDFE", fg_color="transparent", border_width=1
+     fg_color="transparent", border_width=1
 )
 button2.pack(pady=20)
 button2.place(x=(x - 50), y=267)
+
+chess_button = customtkinter.CTkButton(
+    sidebar_frame,
+    text="Chess",
+    command=chess,
+    corner_radius=50,
+    font=my_font_for_buttons,
+     fg_color="transparent", border_width=1 
+)
+chess_button.pack(pady=20)
+chess_button.place(x=15, y=(coord_y_1 - -355))
 
 
 my_button = customtkinter.CTkButton(
@@ -996,7 +964,7 @@ my_button = customtkinter.CTkButton(
     command=change,
     corner_radius=50,
     font=my_font_for_buttons_2,
-    border_color="#41FDFE", fg_color="transparent", border_width=1
+     fg_color="transparent", border_width=1
 )
 my_button.pack(pady=20)
 my_button.place(x=22, y=(coord_y + 355))
@@ -1036,7 +1004,6 @@ if __name__ == "__main__":
 
         is_speaker_working = input("Is The Speaker Working? Answer Properly Because This Will Affect Whether To Enable Speak Mode Or Not (yes or no answer these two options): ")
         root.mainloop()
-        text_window.mainloop()
         age_safety.age_safety(yesorno="Y")
 
     if md5(user_entry) != password:
