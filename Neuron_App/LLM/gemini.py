@@ -14,23 +14,23 @@ generation_config = {
     "top_k": 0,
     "max_output_tokens": 2048,
 }
-safety_settings = [
-    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-    {
-        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "threshold": "BLOCK_MEDIUM_AND_ABOVE",
-    },
-    {
-        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "threshold": "BLOCK_MEDIUM_AND_ABOVE",
-    },
-]
+safety_settings = [{"category": "HARM_CATEGORY_HARASSMENT",
+                    "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+                   {"category": "HARM_CATEGORY_HATE_SPEECH",
+                    "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+                   {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                    "threshold": "BLOCK_MEDIUM_AND_ABOVE",
+                    },
+                   {"category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                    "threshold": "BLOCK_MEDIUM_AND_ABOVE",
+                    },
+                   ]
 model = genai.GenerativeModel(
     model_name=settings.gemini_model,
     generation_config=generation_config,
     safety_settings=safety_settings,
 )
+
 
 @lru_cache(maxsize=None)
 def humanize_response(text: str) -> str:
@@ -129,16 +129,21 @@ def humanize_response(text: str) -> str:
 
     for word, replacements in synonyms.items():
         # Replace each occurrence of the word using regex
-        humanized_text = re.sub(fr'\b({word})\b', lambda m: random.choice(replacements), humanized_text)
+        humanized_text = re.sub(
+            fr'\b({word})\b',
+            lambda m: random.choice(replacements),
+            humanized_text)
 
     # Replace "you" with "I" in some cases (simple implementation)
     if "you" in humanized_text and "I" not in humanized_text:
-        humanized_text = humanized_text.replace("you", "I", 1)  # Replace first occurrence
+        humanized_text = humanized_text.replace(
+            "you", "I", 1)  # Replace first occurrence
 
     return humanized_text
 
 
 convo = model.start_chat(history=[])
+
 
 @lru_cache
 def city():
@@ -150,11 +155,13 @@ def city():
     city = city
     return city
 
+
 def memory_collector():
     with open("\\Neuron_App\\data\\memory.txt", "r") as file:
         query = file.read()
         file.close()
         return query
+
 
 def answer(question):
     sleep(1)

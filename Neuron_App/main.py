@@ -11,6 +11,7 @@ from pwinput import pwinput
 import psutil
 from pytube import YouTube
 import webbrowser
+import platform
 import warnings
 from functools import lru_cache
 from features.basic import (
@@ -24,7 +25,10 @@ from features.basic import (
     clean_temp,
     download_images,
     transcribe_audio,
-    file_organizer
+    file_organizer,
+    notify,
+    playMusic,
+    ocr
 )
 import time
 import qrcode
@@ -48,16 +52,17 @@ warnings.filterwarnings("ignore")
 root = customtkinter.CTk()
 customtkinter.set_widget_scaling(0.80)
 customtkinter.set_window_scaling(1)
-root.attributes('-alpha',0.935)
+root.attributes('-alpha', 0.935)
 root.resizable(False, False)
+
 
 def is_cam_opened():
     cap = cv2.VideoCapture(0)
-    
+
     if cap.isOpened():
         cap.release()
         print("Camera is Available")
-    
+
     if not cap.isOpened():
         print("Camera is Not Available")
 
@@ -102,6 +107,7 @@ my_font = customtkinter.CTkFont(family="Consolas", size=25, slant="italic")
 my_font_for_buttons = customtkinter.CTkFont(family="Consolas", size=15)
 my_font_for_buttons_2 = customtkinter.CTkFont(family="Consolas", size=13)
 
+
 @lru_cache
 def Temp(city):
     import json
@@ -130,8 +136,8 @@ def Temp(city):
             add("Error: 'main' key not found in API response")
     else:
         add(
-            f"Error: Failed to fetch data from API. \nStatus code: {response.status_code}"
-        )
+            f"Error: Failed to fetch data from API. \nStatus code: {
+                response.status_code}")
     IP = requests.get("https://api.ipify.org").text
     url = "https://get.geojs.io/v1/ip/geo/" + IP + ".json"
     geo_reqeust = requests.get(url)
@@ -140,6 +146,7 @@ def Temp(city):
 
     city = city
     return None
+
 
 def change():
     global mode
@@ -152,6 +159,7 @@ def change():
         customtkinter.set_appearance_mode("dark")
         subprocess.run(dark_sync)
         mode = "dark"
+
 
 quotes = [
     '"Love what you do."',
@@ -224,8 +232,10 @@ def ytDownloader(yt_url):
     video = yt.streams.get_highest_resolution()
     video.download()
 
+
 def whatsapp_send():
     global button2_pressed
+
     def delete():
         input_box.delete(0, "end")
 
@@ -233,7 +243,7 @@ def whatsapp_send():
     time.sleep(4.5)
     delete()
     add("Contact or Group ->")
-    
+
     # Get the mode from the input box
     mode = input_box.get().lower()
 
@@ -247,13 +257,13 @@ def whatsapp_send():
                 add(f"What Text Do You Want To Send to {phone_number}: ")
                 if button2_pressed:  # Check if button2 is pressed
                     message = input_box.get()
-                    
+
                     time_hour = 14
                     time_minute = 50
                     waiting_time_to_send = 15
                     close_tab = True
                     waiting_time_to_close = 2
-                    
+
                     pywhatkit.sendwhatmsg(
                         phone_number,
                         message,
@@ -283,7 +293,7 @@ def whatsapp_send():
                     waiting_time_to_send = 15
                     close_tab = True
                     waiting_time_to_close = 2
-                    
+
                     pywhatkit.sendwhatmsg_to_group(
                         group_id,
                         message,
@@ -301,18 +311,25 @@ def whatsapp_send():
         add("Please Type in The Following Options: 'Contact' or 'Group'")
         whatsapp_send()
 
+
 def memory(user_response, ai_response):
     with open(f"\\Neuron_App\\data\\memory.txt", "r+") as file:
-        file.write(f"User Response: {user_response} | AI Response: {ai_response}")
+        file.write(
+            f"User Response: {user_response} | AI Response: {ai_response}")
         file.close()
+
 
 def output():
     global button2_pressed
     user = input_box.get().lower()
+
     def delete():
         input_box.delete(0, "end")
 
-    if re.search(("reduce" or "dim" or "lower") and ("light" or "lights" or "brightness"), user):
+    if re.search(
+            ("reduce" or "dim" or "lower") and (
+                "light" or "lights" or "brightness"),
+            user):
         dim_light()
         add("I have Dimmed The Brightness")
 
@@ -349,13 +366,20 @@ def output():
         add("I Have made A screenshot sir")
 
     if re.search("shutdown", user):
-        os.system("shutdown /s /t 1")
+        if platform.system() == "Windows":
+            os.system("shutdown /s /t 0")
+        elif platform.system() == "Linux":
+            os.system("shutdown now")
+        elif platform.system() == "Darwin":  # macOS
+            os.system("sudo shutdown -h now")
 
     if re.search("restart", user):
-        os.system("shutdown /r /t 1")
-
-    if re.search("sleep", user):
-        os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+        if platform.system() == "Windows":
+            os.system("shutdown /r /t 0")
+        elif platform.system() == "Linux":
+            os.system("reboot")
+        elif platform.system() == "Darwin":  # macOS
+            os.system("sudo shutdown -r now")
 
     if re.search("youtube search", user):
         user = user.replace("youtube search", "")
@@ -390,54 +414,62 @@ def output():
 
             elif batt.percent <= 25 and batt.percent >= 50:
                 add(
-                    f"The Battery is {batt.percent} but you \nhave to charge since it is kinda low!"
-                )
+                    f"The Battery is {
+                        batt.percent} but you \nhave to charge since it is kinda low!")
 
             elif batt.percent <= 10 and batt.percent >= 25:
                 add(
-                    f"The Battery is {batt.percent} so really you must charge it right away!"
-                )
+                    f"The Battery is {
+                        batt.percent} so really you must charge it right away!")
 
             elif batt.percent <= 5 and batt.percent >= 10:
                 add(
-                    f"Sir, You must charge you computer right now because it is {batt.percent}"
-                )
+                    f"Sir, You must charge you computer right now because it is {
+                        batt.percent}")
 
             elif batt.percent <= 1 and batt.percent >= 5:
                 add(
-                    f"Sir it is Extremely Low because it is {batt.percent}. \nCharge it Immediately!"
-                )
+                    f"Sir it is Extremely Low because it is {
+                        batt.percent}. \nCharge it Immediately!")
 
     if re.search("open", user):
         if re.search("article" or "report" or "research", user):
             topic = response(f"What is the Topic of this Question. '{user}'")
             webbrowser.open(f"https://www.google.com/search?q={topic}")
+
         if re.search("globe" or "earth", user):
             add("Showing A Globe of Earth")
             earth()
+
         if re.search("tic tac toe" or "tictactoe" or "tic-tac-toe", user):
             add("Opening Tic Tac Toe Game")
             tictactoe()
+
         if re.search("task" and "manager", user):
             keyboard.press_and_release("ctrl + shift + escape")
             add("I Have Opened Task Manager")
+
         if re.search("iss", user):
             add("Opening the ISS GUI")
             iss()
+
         if re.search("calculator", user):
             calculator()
+
         if re.search("chess", user):
             chess()
+
         if re.search("computer" and "status", user):
             add("Showing Computer's Features")
             status()
+
         else:
             query = user.replace("open ", "")
             query = query.replace("open", "")
             try:
                 openappweb(user)
                 add(f"I Have Opened {query}")
-            except:
+            except BaseException:
                 add(f"I Cannot Open {query}")
 
     if re.search("close", user):
@@ -446,9 +478,8 @@ def output():
         try:
             closeappweb(user)
             add(f"I Have Closed {query}")
-        except:
+        except BaseException:
             add(f"I Cannot Close {query}")
-
 
     if re.search("whatsapp" and "send", user):
         whatsapp_send()
@@ -460,7 +491,7 @@ def output():
         time.sleep(4.5)
         delete()
         add("Enter The Email You Want To Send")
-        if button2_pressed: 
+        if button2_pressed:
             u_email = input_box.get()
             delete()
             add("Enter The Message You Want to Send")
@@ -470,13 +501,16 @@ def output():
         delete()
         add("Email Sended!")
 
-    if re.search(("generate" or "create" or "make") and ("melody" or "music" or "song"), user):
+    if re.search(
+            ("generate" or "create" or "make") and (
+                "melody" or "music" or "song"),
+            user):
         melody_generator.main()
 
     if re.search("change" and "wallpaper", user):
-        add("Type the Image Path (Make Sure You Type The Proper path like C:\\\\your\\\\image\\\\path)")
+        add("Type the Image Path (Make Sure You Type The Proper path)")
         if button2_pressed:
-           image_path = input_box.get()
+            image_path = input_box.get()
         change_wallpaper(image_path)
 
     if re.search("list" and ("processes" or "procesess"), user):
@@ -487,38 +521,42 @@ def output():
         add("File Created!")
 
     if re.search(
-        ("clean" or "destory") and ("temp" or "temporary") and ("files" or "file"), user
-    ):
+            ("clean" or "destory") and (
+                "temp" or "temporary") and (
+                "files" or "file"),
+            user):
         clean_temp()
         add("Completed Cleaning Temporary Files!")
 
     if re.search(("download" or "install") and "image", user):
         add("Sure, Please Type in the URL")
         if button2_pressed:
-           _url = input_box.get()
+            _url = input_box.get()
         add(download_images(_url))
-    
+
     if re.search("transcribe" and "audio", user):
         add("Sure Sir, Please Type in the File Path")
         if button2_pressed:
             path_ = input_box.get()
         delete()
         add(transcribe_audio(file_path=path_))
-    
+
     if re.search("download" and "youtube" and "video", user):
         add("Okay, Type in The Youtube URL")
         if button2_pressed:
-           url = input_box.get()
+            url = input_box.get()
         ytDownloader(url)
-    
+
     if re.search(("make" or "create") and "qrcode", user):
         add("Okay, Type in The URL for the Qr Code")
         if button2_pressed:
-           qr_url = input_box.get()
+            qr_url = input_box.get()
         qrCodeGenerator(qr_url)
 
-    
-    if re.search(("make" or "create") and ("melody" or "music" or "song"), user):
+    if re.search(
+            ("make" or "create") and (
+                "melody" or "music" or "song"),
+            user):
         add("Making a Melody")
         melody_generator()
 
@@ -527,19 +565,31 @@ def output():
         image_generation(user)
         delete()
         add("Generated the Image!")
-    
+
     if re.search("organize" and "files", user):
         add("Okay Sir, I will Organize The Files, Can you type in the Directory?")
         if button2_pressed:
-           directory_path = input_box.get()
-           add(file_organizer(directory_path))
+            directory_path = input_box.get()
+            add(file_organizer(directory_path))
 
     if re.search("type", user):
         add("Okay, I Will Type it On Your Screen")
         answer = user.replace("type", "make")
         answer = response(answer)
         pyautogui.write(answer)
-    
+
+    if re.search("play", user):
+        query = user.replace("play", "")
+        query = query.replace("neuron", "")
+        playMusic(query)
+
+    if re.search("new" and "meeting", user):
+        webbrowser.open("https://meet.new")
+
+    if re.search("read" and "image", user):
+        add("Sure Sir, Just type in the Image Path")
+        if button2_pressed:
+            add(ocr(input_box.get()))
 
     if (
         not ("organize" and "files")
@@ -564,16 +614,17 @@ def output():
         or ("screenshot")
         or ("shutdown")
         or ("restart")
-        or ("sleep")
         or ("youtube search")
         or ("transcribe" and "audio")
         or ("download" and "youtube" and "video")
         or (("make" or "create") and "qrcode")
-        or ("type") in user
+        or ("type")
+        or ("new" and "meeting") in user
     ):
         ans = response(user)
         memory(user, ans)
         add(ans)
+
 
 def icon_close():
     customtkinter.set_appearance_mode("dark")
@@ -582,7 +633,8 @@ def icon_close():
     icon_window.title("Neuron App")
     icon_window.geometry("400x250")
 
-    label_image1 = customtkinter.CTkLabel(icon_window, text="Neuron", font=("Consolas", 65))
+    label_image1 = customtkinter.CTkLabel(
+        icon_window, text="Neuron", font=("Consolas", 65))
     label_image1.pack(pady=20)
 
     def show_original():
@@ -594,13 +646,19 @@ def icon_close():
         exit()
 
     my_button = customtkinter.CTkButton(
-        icon_window, text="Show Features", command=show_original, corner_radius=50, border_color="#41FDFE"
-    )
+        icon_window,
+        text="Show Features",
+        command=show_original,
+        corner_radius=50,
+        border_color="#41FDFE")
     my_button.pack(pady=20)
     my_button.place(x=50, y=200)
     my_button2 = customtkinter.CTkButton(
-        icon_window, text="Exit", command=destoryicon, corner_radius=50, border_color="#41FDFE"
-    )
+        icon_window,
+        text="Exit",
+        command=destoryicon,
+        corner_radius=50,
+        border_color="#41FDFE")
     my_button2.pack(pady=20)
     my_button2.place(x=205, y=200)
 
@@ -667,6 +725,7 @@ def qrcode_gui():
     my_button2.pack(pady=20)
     my_button2.place(x=450, y=200)
 
+
 def add(user_text: str):
     os.system("cls" if os.name == "nt" else "clear")
     queries_widget.delete("1.0", "end")
@@ -688,7 +747,7 @@ def add(user_text: str):
             speak(user_text)
         if re.search("no", is_speaker_working.lower()):
             root.after(1000, animate_label)
-        
+
 
 def C_Day():
     day = datetime.today().weekday() + 1
@@ -717,8 +776,9 @@ def date():
     date_label.configure(text=string)
     date_label.after(1000, date)
 
+
 @lru_cache
-def temp(): #battery included
+def temp():  # battery included
     IP = requests.get("https://api.ipify.org").text
     url = "https://get.geojs.io/v1/ip/geo/" + IP + ".json"
     geo_reqeust = requests.get(url)
@@ -733,7 +793,6 @@ def temp(): #battery included
         ),
     )
     temp_label.after(3600000, temp)
-    
 
 
 def computer_vision():
@@ -741,10 +800,12 @@ def computer_vision():
         f"{settings.python_exe_location} {settings.dir_agi}\\features\\Computer_Vision\\GUi.py"
     )
 
+
 def chess():
     os.system(
         f"{settings.python_exe_location} {settings.dir_agi}\\features\\Chess\\ChessGame.py"
     )
+
 
 def melody():
     os.system(
@@ -788,7 +849,8 @@ coord_y = (height - 460) + -50
 coord_y_1 = (height - 420) + -650
 x = (width - 250) - 175
 
-sidebar_frame = customtkinter.CTkFrame(root, width=175, height=550, corner_radius=30)
+sidebar_frame = customtkinter.CTkFrame(
+    root, width=175, height=550, corner_radius=30)
 sidebar_frame.pack(pady=20)
 sidebar_frame.place(x=10, y=(coord_y_1 + 325))
 
@@ -800,7 +862,7 @@ exit_button = customtkinter.CTkButton(
     corner_radius=50,
     hover_color="red",
     font=("Consolas", 15),
-     fg_color="transparent", border_width=1
+    fg_color="transparent", border_width=1
 )
 exit_button.pack(pady=20)
 exit_button.place(x=15, y=(coord_y_1 - -805))
@@ -817,7 +879,7 @@ icon_button = customtkinter.CTkButton(
     command=icon_close,
     corner_radius=50,
     font=my_font_for_buttons,
-     fg_color="transparent", border_width=1
+    fg_color="transparent", border_width=1
 )
 icon_button.pack(pady=20)
 icon_button.place(x=13, y=(coord_y_1 - -555))
@@ -828,7 +890,7 @@ status_button = customtkinter.CTkButton(
     command=status,
     corner_radius=50,
     font=my_font_for_buttons,
-     fg_color="transparent", border_width=1
+    fg_color="transparent", border_width=1
 )
 status_button.pack(pady=20)
 status_button.place(x=15, y=(coord_y_1 - -605))
@@ -843,7 +905,9 @@ temp_label.pack(pady=20)
 temp_label.place(x=260, y=(coord_y + 350))
 temp()
 
-queries_widget = customtkinter.CTkTextbox(root, width=800, height=180, font=("Consolas", 15), corner_radius=50)
+queries_widget = customtkinter.CTkTextbox(
+    root, width=800, height=180, font=(
+        "Consolas", 15), corner_radius=50)
 queries_widget.pack(pady=20)
 queries_widget.place(x=300, y=367)
 button2_pressed = False
@@ -858,7 +922,9 @@ day_label = customtkinter.CTkLabel(root, text=C_Day(), font=("Consolas", 25))
 day_label.pack(pady=30, padx=30)
 day_label.place(x=(x + 150), y=155)  # 260
 
-label_neuron = customtkinter.CTkLabel(root, text="Neuron", font=("Ankh Sanctuary", 165), text_color="#41FDFE")
+label_neuron = customtkinter.CTkLabel(
+    root, text="Neuron", font=(
+        "Ankh Sanctuary", 165), text_color="#41FDFE")
 label_neuron.pack(pady=20)
 
 earth_button = customtkinter.CTkButton(
@@ -867,7 +933,7 @@ earth_button = customtkinter.CTkButton(
     font=my_font_for_buttons,
     command=earth,
     corner_radius=50,
-     fg_color="transparent", border_width=1
+    fg_color="transparent", border_width=1
 )
 earth_button.pack(pady=20)
 earth_button.place(x=15, y=(coord_y_1 - -455))
@@ -878,7 +944,7 @@ iss_button = customtkinter.CTkButton(
     font=my_font_for_buttons,
     command=iss,
     corner_radius=50,
-     fg_color="transparent", border_width=1
+    fg_color="transparent", border_width=1
 )
 iss_button.pack(pady=20)
 iss_button.place(x=15, y=(coord_y_1 - -505))
@@ -899,7 +965,7 @@ calc_button = customtkinter.CTkButton(
     command=calculator,
     corner_radius=50,
     font=my_font_for_buttons_2,
-     fg_color="transparent", border_width=1
+    fg_color="transparent", border_width=1
 )
 calc_button.pack(pady=20)
 calc_button.place(x=15, y=(coord_y_1 - -310))
@@ -910,7 +976,7 @@ tictactoe_button = customtkinter.CTkButton(
     command=tictactoe,
     corner_radius=50,
     font=my_font_for_buttons,
-     fg_color="transparent", border_width=1
+    fg_color="transparent", border_width=1
 )
 tictactoe_button.pack(pady=20)
 tictactoe_button.place(x=15, y=(coord_y_1 - -405))
@@ -921,15 +987,17 @@ comp_vis_button = customtkinter.CTkButton(
     command=computer_vision,
     corner_radius=50,
     font=my_font_for_buttons_2,
-     fg_color="transparent", border_width=1
+    fg_color="transparent", border_width=1
 )
 comp_vis_button.pack(pady=20)
 comp_vis_button.place(x=15, y=(coord_y_1 - -655))
+
 
 def button2_command():
     global button2_pressed
     button2_pressed = True  # Set the variable to True when the button is pressed
     output()  # Call the output function
+
 
 # Modify the button2 to use the button2_command
 button2 = customtkinter.CTkButton(
@@ -941,7 +1009,7 @@ button2 = customtkinter.CTkButton(
     width=35,
     height=45,
     font=my_font_for_buttons,
-     fg_color="transparent", border_width=1
+    fg_color="transparent", border_width=1
 )
 button2.pack(pady=20)
 button2.place(x=(x - 50), y=267)
@@ -952,7 +1020,7 @@ chess_button = customtkinter.CTkButton(
     command=chess,
     corner_radius=50,
     font=my_font_for_buttons,
-     fg_color="transparent", border_width=1 
+    fg_color="transparent", border_width=1
 )
 chess_button.pack(pady=20)
 chess_button.place(x=15, y=(coord_y_1 - -355))
@@ -964,7 +1032,7 @@ my_button = customtkinter.CTkButton(
     command=change,
     corner_radius=50,
     font=my_font_for_buttons_2,
-     fg_color="transparent", border_width=1
+    fg_color="transparent", border_width=1
 )
 my_button.pack(pady=20)
 my_button.place(x=22, y=(coord_y + 355))
@@ -974,9 +1042,10 @@ if __name__ == "__main__":
     warnings.filterwarnings("ignore")
 
     import hashlib
+
     def md5(input_string):
         return hashlib.md5(input_string.encode()).hexdigest()
-    
+
     with open(f"{settings.dir_agi}\\data\\password.txt", "r+") as pwd:
         password = pwd.read()
         if password == "":
@@ -984,10 +1053,10 @@ if __name__ == "__main__":
             pwd.write(md5(new_password))
             password = md5(new_password)
             pwd.close()
-    
 
     user_entry = pwinput("Enter Your Password -> ")
     if md5(user_entry) == password:
+        notify("Neuron Is Ready To Assist You!")
         with open(f"{settings.dir_agi}\\data\\age.txt", "r+") as file:
             age_file = file.read()
             if age_file == "":
@@ -995,14 +1064,17 @@ if __name__ == "__main__":
                 age = md5(age)
                 file.write(age)
                 file.close()
-            
-            if md5(age_file) == md5("17") or md5("16") or md5("15") or md5("14") or md5("13") or md5("12") or md5("11") or md5("10") or md5("9") or md5("8") or md5("7") or md5("6") or md5("5") or md5("4") or md5("3") or md5("2") or md5("1") or md5("0"):
+
+            if md5(age_file) == md5("17") or md5("16") or md5("15") or md5("14") or md5("13") or md5("12") or md5("11") or md5(
+                    "10") or md5("9") or md5("8") or md5("7") or md5("6") or md5("5") or md5("4") or md5("3") or md5("2") or md5("1") or md5("0"):
                 age_safety.age_safety("N")
-            
-            if not md5(age_file) == md5("17") or md5("16") or md5("15") or md5("14") or md5("13") or md5("12") or md5("11") or md5("10") or md5("9") or md5("8") or md5("7") or md5("6") or md5("5") or md5("4") or md5("3") or md5("2") or md5("1") or md5("0"):
+
+            if not md5(age_file) == md5("17") or md5("16") or md5("15") or md5("14") or md5("13") or md5("12") or md5("11") or md5(
+                    "10") or md5("9") or md5("8") or md5("7") or md5("6") or md5("5") or md5("4") or md5("3") or md5("2") or md5("1") or md5("0"):
                 age_safety.age_safety("Y")
 
-        is_speaker_working = input("Is The Speaker Working? Answer Properly Because This Will Affect Whether To Enable Speak Mode Or Not (yes or no answer these two options): ")
+        is_speaker_working = input(
+            "Is The Speaker Working? Answer Properly Because This Will Affect Whether To Enable Speak Mode Or Not (yes or no answer these two options): ")
         root.mainloop()
         age_safety.age_safety(yesorno="Y")
 

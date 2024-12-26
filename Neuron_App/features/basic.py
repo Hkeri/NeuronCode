@@ -18,7 +18,37 @@ import requests
 import speech_recognition as sr
 import shutil
 from pypdf import PdfReader
+from notifypy import Notify
+import easyocr
 
+def ocr(image_path):
+    # Initialize the EasyOCR reader
+    reader = easyocr.Reader(['en'])  # Specify the language(s) you want to use
+
+    # Path to the image file
+    image_path = image_path  # Replace with your image path
+
+    # Perform OCR on the image
+    results = reader.readtext(image_path)
+
+    # Print the detected text
+    for (bbox, text, prob) in results:
+        return (text)
+
+def playMusic(song_name):
+    try:
+        import pywhatkit
+        pywhatkit.playonyt(song_name)
+        speak(f"Playing {song_name}")
+    except Exception as e:
+        speak("Sir I cannot play that certain song")
+
+def notify(text):
+    notification = Notify
+    notification.title = "Neuron"
+    notification.message = text
+    notification.send()
+    
 def read_pdf(pdf_file):
     # creating a pdf reader object
     reader = PdfReader(pdf_file)
