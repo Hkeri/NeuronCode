@@ -312,13 +312,6 @@ def whatsapp_send():
         whatsapp_send()
 
 
-def memory(user_response, ai_response):
-    with open(f"\\Neuron_App\\data\\memory.txt", "r+") as file:
-        file.write(
-            f"User Response: {user_response} | AI Response: {ai_response}")
-        file.close()
-
-
 def output():
     global button2_pressed
     user = input_box.get().lower()
@@ -622,7 +615,6 @@ def output():
         or ("new" and "meeting") in user
     ):
         ans = response(user)
-        memory(user, ans)
         add(ans)
 
 

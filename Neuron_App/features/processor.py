@@ -1,6 +1,5 @@
 from LLM.gemini import answer
 from LLM.blackbox import code
-from LLM.phind import generate
 from LLM.wolframalpha import stem_answers
 from PIL.Image import open as openPIL
 from requests import get
@@ -13,10 +12,7 @@ def memoized_answer():
 
   def inner_answer(question):
     if question not in cache:
-      try:
-        result = answer(question)
-      except:
-        result = generate(question)
+      result = answer(question)
       cache[question] = result
     return cache[question]
 
